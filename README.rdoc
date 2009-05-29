@@ -1,0 +1,7 @@
+= spectate
+
+Description goes here.
+
+== Copyright
+
+Copyright (c) 2009 Stephen Eley. See LICENSE for details.
