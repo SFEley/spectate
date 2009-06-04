@@ -10,4 +10,8 @@ require 'spectate'
 
 Spec::Runner.configure do |config|
   
+  # "And how do you take your coffee, Agent Cooper?"
+  # "Black as midnight on a moonless night."
+  config.mock_with :mocha
+  
 end

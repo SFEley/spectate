@@ -11,6 +11,12 @@ begin
     gem.authors = ["Stephen Eley"]
     gem.rubyforge_project = "spectate"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+    
+    # ADDED BY SFE 
+    gem.requirements << "Tokyo Cabinet (easily installed from apt, MacPorts, etc.)"
+    gem.add_development_dependency "rspec", ">= 1.2.6"
+    gem.add_development_dependency "mocha", ">= 0.9.5"
+    gem.add_runtime_dependency "rufus-tokyo", ">=0.1.12"
   end
 
   Jeweler::RubyforgeTasks.new

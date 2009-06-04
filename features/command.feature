@@ -11,5 +11,6 @@ Feature: Command line utility
 		Given no Spectate is running
 		When I execute "spectate"
 		Then I should see "Starting Spectate"
+		 And Spectate should be running
 
 	
