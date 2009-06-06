@@ -1,10 +1,12 @@
 require 'spec'
 
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+SPECDIR = File.dirname(__FILE__)
+
+$LOAD_PATH.unshift(SPECDIR)
+$LOAD_PATH.unshift(File.join(SPECDIR, '..', 'lib'))
 
 # Make sure the binary is in our path
-ENV['PATH'] = File.expand_path(File.join(File.dirname(__FILE__), '..', 'bin')) + ':' + ENV['PATH']
+ENV['PATH'] = File.expand_path(File.join(SPECDIR, '..', 'bin')) + ':' + ENV['PATH']
 
 require 'spectate'
 

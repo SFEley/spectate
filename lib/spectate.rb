@@ -5,4 +5,4 @@ $:.unshift(File.dirname(__FILE__)) unless
 require 'spectate/config'
 
 # Set vital defaults
-Spectate::Config[:basedir] = File.expand_path(File.join('~','.spectate'))
+Spectate::Config[:basedir] = ENV['SPECTATE_DIR'] || File.expand_path(File.join('~','.spectate'))

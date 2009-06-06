@@ -1,0 +1,6 @@
+# # Basic server settings
+# :rackup: true
+# :server: webrick
+# :host: localhost
+# :port: 47502  # The inverse of 20574, the production port
+# :env: testing

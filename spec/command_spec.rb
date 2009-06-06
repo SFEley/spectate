@@ -1,10 +1,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'tmpdir'
-require 'fileutils'
+require 'helpers/config_helpers'
 
 describe "Command 'spectate'" do
+  include Spectate::Spec::ConfigHelpers
+  
+  before(:all) do
+    create_config
+  end
+  
+  it "gets its base directory from the SPECTATE_DIR environment variable if specified" do
+    unmade_dir = File.expand_path("~/blahhhhh")
+    ENV['SPECTATE_DIR'] = unmade_dir
+    `spectate`.should =~ /Directory #{Regexp.escape(unmade_dir)} not found!/
+  end
+  
   it "executes" do
-    system('spectate').should be_true
+    lambda{system('spectate')}.should_not raise_error
   end
   
   # We have several options for displaying help
@@ -24,7 +35,7 @@ describe "Command 'spectate'" do
   end
   
   it "attempts to start Spectate if not already running" do
-    `spectate`.should =~ /Starting Spectate/
+    `spectate -d #{@tempdir}`.should =~ /Starting Spectate/
   end
   
   %w{-d --directory}.each do |option|
@@ -38,5 +49,9 @@ describe "Command 'spectate'" do
       # Ensure cleanup
       FileUtils.rm_r tmpdir, :force => true, :secure => true
     end
+  end
+  
+  after(:all) do
+    remove_config
   end
 end

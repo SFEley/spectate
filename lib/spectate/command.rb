@@ -3,6 +3,7 @@ require 'spectate'
 
 module Spectate
   DEFAULT_PORT = "20574"
+  SERVER_TYPES = %w[passenger]
   
   # Drives the 'spectate' command line utility.
   class Command
@@ -10,21 +11,33 @@ module Spectate
     # The primary event called by the command line
     def self.run
       skip_server = false
+      only_setup = false
       unless ARGV.empty?
         options = OptionParser.new
         options.on("-d=DIR", "--directory=DIR", String, "Set base directory for support files (default is ~/.spectate)") do |val| 
           Spectate::Config[:basedir] = val
           puts "Directory set to #{Spectate::Config[:basedir]}"
         end
+        options.on("--setup", "=TYPE", SERVER_TYPES, "Create the base directory and initialize config.yml with the given server type (#{SERVER_TYPES.join(', ')})") do |type|
+          only_setup = true
+        end
         options.on("--help", "-?", "--usage", "Displays this help screen") {|o| puts options.to_s; skip_server = true}
         unparsed = options.parse(ARGV)
       end
       
-      Spectate::Config.load_configuration
-      self.ensure_server unless skip_server
+      if only_setup
+        Spectate::Config.generate_configuration
+      else
+        Spectate::Config.load_configuration
+        self.ensure_server unless skip_server
+      end
       true
     rescue OptionParser::ParseError
       puts "Oops... #{$!}"
+      puts options
+      false
+    rescue StandardError
+      puts $!
       puts options
       false
     end
