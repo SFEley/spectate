@@ -9,6 +9,8 @@ $LOAD_PATH.unshift(File.join(SPECDIR, '..', 'lib'))
 ENV['PATH'] = File.expand_path(File.join(SPECDIR, '..', 'bin')) + ':' + ENV['PATH']
 
 require 'spectate'
+require 'helpers/config_helpers'
+require 'helpers/server_helpers'
 
 Spec::Runner.configure do |config|
   

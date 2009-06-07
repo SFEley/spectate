@@ -2,7 +2,7 @@ require 'optparse'
 require 'spectate'
 
 module Spectate
-  SERVER_TYPES = %w[passenger]
+  SERVER_TYPES = %w[passenger thin mongrel webrick]
   
   PASSENGER_DEFAULTS = {
     'rackup' => false,
@@ -25,7 +25,7 @@ module Spectate
       only_setup = false
       unless ARGV.empty?
         options = OptionParser.new
-        options.on("-d=DIR", "--directory=DIR", String, "Set base directory for support files (default is ~/.spectate)") do |val| 
+        options.on("-d", "--directory", "=DIR", String, "Set base directory for support files (default is ~/.spectate)") do |val| 
           Spectate::Config[:basedir] = val
           puts "Directory set to #{Spectate::Config[:basedir]}"
         end
@@ -35,7 +35,15 @@ module Spectate
           case type
           when 'passenger':
             Spectate::Config.default(PASSENGER_DEFAULTS)
+          else
+            Spectate::Config.default(RACKUP_DEFAULTS)
           end
+        end
+        options.on("--host", "-h", "=NAME", String, "Set hostname or IP address for server access") do |host|
+          Spectate::Config['host'] = host
+        end
+        options.on("--port", "-p", "=PORT", Integer, "Set port number for server access") do |port|
+          Spectate::Config['port'] = port
         end
         options.on("--help", "-?", "--usage", "Displays this help screen") {|o| puts options.to_s; skip_server = true}
         unparsed = options.parse(ARGV)

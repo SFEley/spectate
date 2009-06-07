@@ -1,7 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'helpers/config_helpers'
 
 describe "Configuration" do
+  describe "version" do
+    it "is a proper major.minor.build number" do
+      Spectate::VERSION.should =~ /\d+\.\d+\.\d+/
+    end
+  end
+  
   describe "variables" do
     it "can be set" do
       Spectate::Config['foo'] = 'bar'
@@ -91,9 +96,19 @@ describe "Configuration" do
         File.exists?(@configfile).should be_true
       end
       
-      it "writes config values to the file" do
+      it "writes the server value to the file" do
         `spectate -d #{@tempdir} --setup #{@option}`
         File.read(@configfile).should =~ /server: #{@option}/
+      end
+      
+      it "writes the host if given" do
+        `spectate -d #{@tempdir} -h foo.bar.local --setup #{@option}`
+        File.read(@configfile).should =~ /host: foo\.bar\.local/
+      end
+      
+      it "writes the port if given" do
+        `spectate -d #{@tempdir} -p 55555 --setup #{@option}`
+        File.read(@configfile).should =~ /port: 55555/
       end
       
     end
@@ -112,8 +127,47 @@ describe "Configuration" do
         end
         it_should_behave_like "a valid setup option"
         
+        it "sets rackup to false" do
+          `spectate -d #{@tempdir} --setup #{@option}`
+          File.read(@configfile).should =~ /rackup: false/
+        end
+        
+        it "doesn't set a port" do
+          `spectate -d #{@tempdir} --setup #{@option}`
+          File.read(@configfile).should_not =~ /port/
+        end
+        
+        it "defaults the host to spectate.local" do
+          `spectate -d #{@tempdir} --setup #{@option}`
+          File.read(@configfile).should =~ /host: spectate\.local/
+        end
       end
 
+      %w{ webrick mongrel thin}.each do |server|
+        describe "#{server}" do
+          before(:each) do
+            @option = server
+          end
+
+          it_should_behave_like "a valid setup option"
+
+          it "sets rackup to true" do
+            `spectate -d #{@tempdir} --setup #{@option}`
+            File.read(@configfile).should =~ /rackup: true/
+          end
+
+          it "sets the port to the default of 20574" do
+            `spectate -d #{@tempdir} --setup #{@option}`
+            File.read(@configfile).should =~ /port: 20574/
+          end
+
+          it "defaults the host to localhost" do
+            `spectate -d #{@tempdir} --setup #{@option}`
+            File.read(@configfile).should =~ /host: localhost/
+          end
+        end
+      end
+      
       after(:each) do
         FileUtils.rm_r @tempdir, :force => true, :secure => true
       end

@@ -1,5 +1,4 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'helpers/config_helpers'
 
 describe "Command 'spectate'" do
   include Spectate::Spec::ConfigHelpers
@@ -45,12 +44,14 @@ describe "Command 'spectate'" do
     end
     
     it "sets a different base directory when called with #{option} dirname" do
-      tmpdir = Dir.tmpdir
+      tmpdir = Dir.mktmpdir
       `spectate #{option} #{tmpdir}`.should =~ /Directory set to #{Regexp.escape(tmpdir)}/
       # Ensure cleanup
       FileUtils.rm_r tmpdir, :force => true, :secure => true
     end
   end
+  
+  
   
   after(:all) do
     remove_config
