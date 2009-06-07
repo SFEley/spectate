@@ -17,12 +17,21 @@ module Spectate
       @config[key] = val
     end
     
+    def self.delete(key)
+      @config.delete(key)
+    end
+    
+    def self.default(hash)
+      @config = hash.merge(@config)
+    end
+    
     # Loads persistent values from the config.yml file in the base directory.
     # Assumes that the :basedir configuration variable has already been set before calling.
     def self.load_configuration
       raise "Directory #{self[:basedir]} not found!\nRun spectate --setup to initialize things." unless File.directory?(self[:basedir])
       configfile = File.join(self[:basedir], "config.yml")
-      raise "File #{self[:basedir]}/config.yml not found!\nRun spectate --setup to initialize things." unless File.exists?(configfile)
+      raise "File #{configfile} not found!\nRun spectate --setup to initialize things." unless File.exists?(configfile)
+      @config.merge!(YAML.load_file(configfile))
     end
 
     # Confirms that the config.yml file doesn't already exist, then creates one from passed parameters

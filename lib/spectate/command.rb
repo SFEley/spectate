@@ -2,8 +2,19 @@ require 'optparse'
 require 'spectate'
 
 module Spectate
-  DEFAULT_PORT = "20574"
   SERVER_TYPES = %w[passenger]
+  
+  PASSENGER_DEFAULTS = {
+    'rackup' => false,
+    'server' => 'passenger',
+    'host'   => 'spectate.local',
+  }
+  
+  RACKUP_DEFAULTS = {
+    'rackup' => true,
+    'host'   => 'localhost',
+    'port'   => 20574
+  }
   
   # Drives the 'spectate' command line utility.
   class Command
@@ -20,6 +31,11 @@ module Spectate
         end
         options.on("--setup", "=TYPE", SERVER_TYPES, "Create the base directory and initialize config.yml with the given server type (#{SERVER_TYPES.join(', ')})") do |type|
           only_setup = true
+          Spectate::Config['server'] = type
+          case type
+          when 'passenger':
+            Spectate::Config.default(PASSENGER_DEFAULTS)
+          end
         end
         options.on("--help", "-?", "--usage", "Displays this help screen") {|o| puts options.to_s; skip_server = true}
         unparsed = options.parse(ARGV)

@@ -13,7 +13,7 @@ module Spectate
       def create_config
         @tempdir = Dir.mktmpdir
         @configfile = File.join(@tempdir, 'config.yml')
-        FileUtils.cp File.join(SPECDIR, 'files', 'config.yml'), @configfile
+        FileUtils.cp File.join(File.dirname(__FILE__), '..', 'files', 'config.yml'), @configfile
         ENV['SPECTATE_DIR'] = @tempdir
       end
       

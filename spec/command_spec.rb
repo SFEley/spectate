@@ -12,10 +12,11 @@ describe "Command 'spectate'" do
     unmade_dir = File.expand_path("~/blahhhhh")
     ENV['SPECTATE_DIR'] = unmade_dir
     `spectate`.should =~ /Directory #{Regexp.escape(unmade_dir)} not found!/
+    ENV['SPECTATE_DIR'] = @tempdir
   end
   
   it "executes" do
-    lambda{system('spectate')}.should_not raise_error
+    system('spectate').should_not be_nil
   end
   
   # We have several options for displaying help

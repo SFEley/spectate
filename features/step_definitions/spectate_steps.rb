@@ -3,5 +3,5 @@ Given /^no Spectate is running$/ do
 end
 
 Then /^Spectate should be running$/ do
-  Spectate::Client.ping.should succeed
+  Spectate.ping.should be_true
 end
