@@ -15,6 +15,8 @@ describe Spectate::Server do
     response = Net::HTTP.get_response('localhost','/',47502)
     response.message.should =~ /Spectate v#{Spectate::VERSION}/
   end
+  
+  
   after(:all) do
     stop_server
   end

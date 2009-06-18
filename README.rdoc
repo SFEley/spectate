@@ -1,6 +1,6 @@
 = spectate
 
-Description goes here.
+
 
 == Copyright
 

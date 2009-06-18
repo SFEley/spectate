@@ -45,6 +45,8 @@ module Spectate
       end
       puts "Creating config.yml file"
       File.open(configfile, 'w') {|config| YAML.dump(self.to_hash, config)}
+      puts "Creating rackup file"
+      FileUtils.copy File.join(File.dirname(__FILE__), '..', '..', 'generators', 'config.ru'), self[:basedir]
     end
       
         

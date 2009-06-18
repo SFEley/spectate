@@ -2,18 +2,19 @@ require 'optparse'
 require 'spectate'
 
 module Spectate
-  SERVER_TYPES = %w[passenger thin mongrel webrick]
+  SERVER_TYPES = %w[passenger builtin]
   
   PASSENGER_DEFAULTS = {
-    'rackup' => false,
-    'server' => 'passenger',
-    'host'   => 'spectate.local',
+    :rackup => false,
+    :server => 'passenger',
+    :host   => 'spectate.local'
   }
   
   RACKUP_DEFAULTS = {
-    'rackup' => true,
-    'host'   => 'localhost',
-    'port'   => 20574
+    :rackup => true,
+    :server => 'builtin',
+    :host   => 'localhost',
+    :port   => 20574
   }
   
   # Drives the 'spectate' command line utility.
@@ -69,7 +70,10 @@ module Spectate
   private
     def self.ensure_server
       # TODO: Check for existing server running
-      puts "Starting Spectate..."
+      puts "Starting Spectate on #{Spectate::Config[:host]}:#{Spectate::Config[:port]}..."
+      Dir.chdir Spectate::Config[:basedir] do |dir|
+        system "rackup -o #{Spectate::Config[:host]} -p #{Spectate::Config[:port]} config.ru"
+      end
     end
   end
 end

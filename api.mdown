@@ -1,0 +1,15 @@
+The Spectate Model
+==================
+
+The Spectate server follows a consistent tree-based model for storing the status of...well, whatever.  File changes.  Unit test results.  Git commits.  We don't care.  The basic components of a typical Spectate system are:
+
+1. **Monitors** which run client-side and make POST or PUT calls to the Spectate server when something interesting happens;
+2. **Spectators** which are individual nodes on the Spectate server's data tree, each representing the status of some interesting resource;
+3. **Reporters** which query the status of spectators and display the results in some interesting fashion, either by periodic polling or by hook notification.
+
+There's also a command line client to add and remove services, but that's not as interesting.
+
+The architecture of monitors and reporters is left to the implementers of individual services.  The rest of this document deals with spectators, their hierarchy and event model, and the API for communicating with them.
+
+
+
