@@ -1,5 +1,5 @@
 # Spectate lives wherever this config.ru file lives.
-ROOT_DIR = File.expand_path(File.dirname(__FILE__))
+Spectate::ROOT_DIR = File.expand_path(File.dirname(__FILE__))
 
 # If you're developing or customizing Spectate, you can create a 'src'
 # directory and it'll load Spectate from here instead of the gem. If you want to

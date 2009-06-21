@@ -9,6 +9,10 @@ $LOAD_PATH.unshift(File.join(SPECDIR, '..', 'lib'))
 ENV['PATH'] = File.expand_path(File.join(SPECDIR, '..', 'bin')) + ':' + ENV['PATH']
 
 require 'spectate'
+# Get rid of the pre-set base directory, because we don't want to test on live configurations 
+Spectate.send(:remove_const, :ROOT_DIR)
+Spectate.const_set(:ROOT_DIR,nil)
+
 require 'helpers/config_helpers'
 require 'helpers/server_helpers'
 

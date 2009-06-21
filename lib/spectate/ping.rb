@@ -1,4 +1,8 @@
+require 'spectate/client'
 module Spectate
-  def self.ping
+  module Ping
+    def ping
+      true
+    end
   end
 end

@@ -26,6 +26,12 @@ describe "Configuration" do
       Spectate::Config.delete('foo')
       Spectate::Config.to_hash.should_not have_key('foo')
     end
+    
+    it "can be cleared" do
+      Spectate::Config['something'] = 'something else'
+      Spectate::Config.clear!
+      Spectate::Config.to_hash.size.should == 0
+    end
   end
   
   describe "defaults" do
@@ -184,17 +190,57 @@ describe "Configuration" do
   
   describe "loading" do
     include Spectate::Spec::ConfigHelpers
-    before(:all) do
+    before(:each) do
+      Spectate::Config.clear!
       create_config
-      Spectate::Config['basedir'] = @tempdir
+      ENV["SPECTATE_DIR"] = nil
     end
     
-    it "sets Spectate::Config with values from the config file" do
+    it "gets its values from the environment variable if set" do
+      ENV["SPECTATE_DIR"] = @tempdir
       Spectate::Config.load_configuration
       Spectate::Config['port'].should == 47502
     end
+    
+    it "gets its values from the method parameter if given" do
+      Spectate::Config.load_configuration(@tempdir)
+      Spectate::Config['port'].should == 47502
+    end
+    
+    it "gets its values from Spectate::Config['basedir'] if given" do
+      Spectate::Config['basedir'] = @tempdir
+      Spectate::Config.load_configuration
+      Spectate::Config['port'].should == 47502
+    end
+    
+    it "gets its values from ROOT_DIR as a last resort" do
+      Spectate.send(:remove_const, :ROOT_DIR)  # To suppress warnings
+      Spectate.const_set(:ROOT_DIR,@tempdir)
+      Spectate::Config.load_configuration
+      Spectate::Config['port'].should == 47502
+      Spectate.send(:remove_const, :ROOT_DIR)  # To suppress warnings
+      Spectate.const_set(:ROOT_DIR,nil)
+    end
+    
+    it "complains if no base directory can be found" do
+      lambda{Spectate::Config.load_configuration}.should raise_error(RuntimeError, /could not find/i)
+    end
+    
+    it "knows when it hasn't been loaded yet" do
+      Spectate::Config.loaded?.should be_false
+    end
+    
+    it "knows when it has been loaded" do
+      Spectate::Config.load_configuration(@tempdir)
+      Spectate::Config.loaded?.should be_true
+    end
+    
+    it "knows its basedir" do
+      Spectate::Config.load_configuration(@tempdir)
+      Spectate::Config.basedir.should == @tempdir
+    end
       
-    after(:all) do
+    after(:each) do
       remove_config
     end
   end

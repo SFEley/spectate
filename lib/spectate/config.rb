@@ -4,6 +4,7 @@ require 'yaml'
 module Spectate
   module Config
     @config = Hash.new
+    @loaded = false
     
     def self.to_hash
       @config
@@ -21,17 +22,32 @@ module Spectate
       @config.delete(key)
     end
     
+    def self.clear!
+      @config = Hash.new
+      @loaded = false
+    end
+    
     def self.default(hash)
       @config = hash.merge(@config)
     end
     
+    def self.basedir
+      @basedir
+    end
+    
+    def self.loaded?
+      @loaded
+    end
+    
     # Loads persistent values from the config.yml file in the base directory.
-    # Assumes that the :basedir configuration variable has already been set before calling.
-    def self.load_configuration
-      raise "Directory #{self['basedir']} not found!\nRun spectate --setup to initialize things." unless File.directory?(self['basedir'])
-      configfile = File.join(self['basedir'], "config.yml")
-      raise "File #{configfile} not found!\nRun spectate --setup to initialize things." unless File.exists?(configfile)
-      @config.merge!(YAML.load_file(configfile))
+    # Assumes that the basedir configuration variable has already been set before calling.
+    def self.load_configuration(confdir = nil)
+      @basedir = confdir || self['basedir'] || ENV['SPECTATE_DIR'] || ROOT_DIR
+      raise "Could not find a base directory!\nRun spectate --setup to initialize things or tell us your base directory\nwith the -d option." unless basedir
+      raise "Directory #{basedir} not found!\nRun spectate --setup to initialize things." unless File.directory?(basedir)
+      conffile = File.join(basedir, "config.yml")
+      raise "File #{conffile} not found!\nRun spectate --setup to initialize things." unless File.exists?(conffile)
+      @loaded = @config.merge!(YAML.load_file(conffile))
     end
 
     # Confirms that the config.yml file doesn't already exist, then creates one from passed parameters

@@ -52,7 +52,11 @@ describe "Command 'spectate'" do
     it "attempts to start Spectate if not already running" do
       `spectate`.should =~ /Starting Spectate/
     end
-    it "complains if Spectate is already running" 
+    it "complains if Spectate is already running" do
+      `spectate`
+      `spectate`.should =~ /already running/
+    end
+    
     it "creates a PID file in the base directory" do
       `spectate`
       File.exists?(File.join(@tempdir,'spectate.pid')).should be_true

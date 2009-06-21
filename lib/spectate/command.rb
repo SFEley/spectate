@@ -18,6 +18,7 @@ module Spectate
   
   # Drives the 'spectate' command line utility.
   class Command
+    extend Spectate::Ping
     
     # The primary event called by the command line
     def self.run
@@ -74,10 +75,13 @@ module Spectate
     
   private
     def self.ensure_server
-      # TODO: Check for existing server running
-      puts "Starting Spectate on #{Spectate::Config['host']}:#{Spectate::Config['port']}..."
-      Dir.chdir Spectate::Config['basedir'] do |dir|
-        system "rackup -D -o #{Spectate::Config['host']} -p #{Spectate::Config['port']} -P spectate.pid config.ru"
+      if ping
+        puts "Spectate is already running!"
+      else
+        puts "Starting Spectate on #{Spectate::Config['host']}:#{Spectate::Config['port']}..."
+        Dir.chdir Spectate::Config['basedir'] do |dir|
+          system "rackup -D -o #{Spectate::Config['host']} -p #{Spectate::Config['port']} -P spectate.pid config.ru"
+        end
       end
     end
     
