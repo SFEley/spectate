@@ -147,30 +147,30 @@ describe "Configuration" do
         end
       end
 
-    
-      describe "builtin" do
-        before(:each) do
-          @option = "builtin"
-        end
+      %w[thin webrick mongrel].each do |server|
+        describe "#{server}" do
+          before(:each) do
+            @option = "#{server}"
+          end
 
-        it_should_behave_like "a valid setup option"
+          it_should_behave_like "a valid setup option"
 
-        it "sets rackup to true" do
-          `spectate -d #{@tempdir} --setup #{@option}`
-          File.read(@configfile).should =~ /rackup: true/
-        end
+          it "sets rackup to true" do
+            `spectate -d #{@tempdir} --setup #{@option}`
+            File.read(@configfile).should =~ /rackup: true/
+          end
 
-        it "sets the port to the default of 20574" do
-          `spectate -d #{@tempdir} --setup #{@option}`
-          File.read(@configfile).should =~ /port: 20574/
-        end
+          it "sets the port to the default of 20574" do
+            `spectate -d #{@tempdir} --setup #{@option}`
+            File.read(@configfile).should =~ /port: 20574/
+          end
 
-        it "defaults the host to localhost" do
-          `spectate -d #{@tempdir} --setup #{@option}`
-          File.read(@configfile).should =~ /host: localhost/
+          it "defaults the host to localhost" do
+            `spectate -d #{@tempdir} --setup #{@option}`
+            File.read(@configfile).should =~ /host: localhost/
+          end
         end
       end
-      
       after(:each) do
         FileUtils.rm_r @tempdir, :force => true, :secure => true
       end
@@ -186,7 +186,7 @@ describe "Configuration" do
     include Spectate::Spec::ConfigHelpers
     before(:all) do
       create_config
-      Spectate::Config[:basedir] = @tempdir
+      Spectate::Config['basedir'] = @tempdir
     end
     
     it "sets Spectate::Config with values from the config file" do

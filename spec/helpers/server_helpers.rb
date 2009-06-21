@@ -11,6 +11,7 @@ module Spectate
       end
       
       def stop_server
+        `spectate --stop`
         remove_config
       end
     end

@@ -14,6 +14,8 @@ module Spectate
         @tempdir = Dir.mktmpdir
         @configfile = File.join(@tempdir, 'config.yml')
         FileUtils.cp File.join(File.dirname(__FILE__), '..', 'files', 'config.yml'), @configfile
+        FileUtils.cp File.join(File.dirname(__FILE__), '..', '..', 'generators', 'config.ru'), @tempdir
+        FileUtils.ln_s File.expand_path(File.join(File.dirname(__FILE__), '..','..')), File.join(@tempdir,'src')
         ENV['SPECTATE_DIR'] = @tempdir
       end
       

@@ -2,19 +2,18 @@ require 'optparse'
 require 'spectate'
 
 module Spectate
-  SERVER_TYPES = %w[passenger builtin]
+  SERVER_TYPES = %w[passenger thin mongrel webrick]
   
   PASSENGER_DEFAULTS = {
-    :rackup => false,
-    :server => 'passenger',
-    :host   => 'spectate.local'
+    'rackup' => false,
+    'server' => 'passenger',
+    'host'   => 'spectate.local'
   }
   
   RACKUP_DEFAULTS = {
-    :rackup => true,
-    :server => 'builtin',
-    :host   => 'localhost',
-    :port   => 20574
+    'rackup' => true,
+    'host'   => 'localhost',
+    'port'   => 20574
   }
   
   # Drives the 'spectate' command line utility.
@@ -24,11 +23,12 @@ module Spectate
     def self.run
       skip_server = false
       only_setup = false
+      stop_server = false
       unless ARGV.empty?
         options = OptionParser.new
         options.on("-d", "--directory", "=DIR", String, "Set base directory for support files (default is ~/.spectate)") do |val| 
-          Spectate::Config[:basedir] = val
-          puts "Directory set to #{Spectate::Config[:basedir]}"
+          Spectate::Config['basedir'] = val
+          puts "Directory set to #{Spectate::Config['basedir']}"
         end
         options.on("--setup", "=TYPE", SERVER_TYPES, "Create the base directory and initialize config.yml with the given server type (#{SERVER_TYPES.join(', ')})") do |type|
           only_setup = true
@@ -47,6 +47,7 @@ module Spectate
           Spectate::Config['port'] = port
         end
         options.on("--help", "-?", "--usage", "Displays this help screen") {|o| puts options.to_s; skip_server = true}
+        options.on("--stop", "Stops the Spectate server if running") {stop_server = true}
         unparsed = options.parse(ARGV)
       end
       
@@ -54,7 +55,11 @@ module Spectate
         Spectate::Config.generate_configuration
       else
         Spectate::Config.load_configuration
-        self.ensure_server unless skip_server
+        if stop_server
+          self.kill_server
+        else
+          self.ensure_server unless skip_server
+        end
       end
       true
     rescue OptionParser::ParseError
@@ -70,9 +75,20 @@ module Spectate
   private
     def self.ensure_server
       # TODO: Check for existing server running
-      puts "Starting Spectate on #{Spectate::Config[:host]}:#{Spectate::Config[:port]}..."
-      Dir.chdir Spectate::Config[:basedir] do |dir|
-        system "rackup -o #{Spectate::Config[:host]} -p #{Spectate::Config[:port]} config.ru"
+      puts "Starting Spectate on #{Spectate::Config['host']}:#{Spectate::Config['port']}..."
+      Dir.chdir Spectate::Config['basedir'] do |dir|
+        system "rackup -D -o #{Spectate::Config['host']} -p #{Spectate::Config['port']} -P spectate.pid config.ru"
+      end
+    end
+    
+    def self.kill_server()
+      pidfile = File.join(Spectate::Config['basedir'], 'spectate.pid')
+      pid = File.read(pidfile).to_i if File.exists?(pidfile)
+      if pid and `ps x #{pid}` =~ /rackup.*-p #{Spectate::Config['port']}/
+        Process.kill("KILL",pid) and puts "Spectate stopped."
+        File.delete(pidfile)
+      else
+        puts "Spectate wasn't running! (Or you're using Passenger, or your PID file is incorrect,\n  or it's on a different server.  In any case, you're on your own.)"
       end
     end
   end

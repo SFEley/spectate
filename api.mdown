@@ -7,9 +7,51 @@ The Spectate server follows a consistent tree-based model for storing the status
 2. **Spectators** which are individual nodes on the Spectate server's data tree, each representing the status of some interesting resource;
 3. **Reporters** which query the status of spectators and display the results in some interesting fashion, either by periodic polling or by hook notification.
 
-There's also a command line client to add and remove services, but that's not as interesting.
+There's also a command line client to add and remove services, but it's not interesting.
 
-The architecture of monitors and reporters is left to the implementers of individual services.  The rest of this document deals with spectators, their hierarchy and event model, and the API for communicating with them.
+The rest of this document deals with spectators, their hierarchy and event model, and the API for communicating with them.  The architecture of monitors and reporters is currently left for service implementers.
+
+Anatomy of a Spectator
+----------------------
+A spectator is any object of a class descended from **Spectate::Spectator**.  This class provides some basic accessors for organization:
+
+* **name** is a string used to identify the spectator for reporting.  It can contain capital letters, spaces, etc., and should be both readable and relevant for human users.  Names must be unique among siblings (the children of a common parent).
+* **summary** returns a string reporting a human-readable status for this spectator.
+* **hooks** are an array of URLs which will receive a POST containing the spectator's serialized state whenever it's updated.
+
+You can also define any other properties or behavior you wish in subclasses.  You can make an property _persistent_ by using the **spectates** declaration:
+
+		class NiftySpectator < Spectate::Spectator
+			spectates :niftiness, 
+								:coolness
+			spectates :hipness, :quiet => true
+		end
+	
+Internally, persistent properties are just standalone key/value pairs; the key is the concatenation of the spectator's path, the URI _fragment_ identifier (i.e. the hash symbol, '#') and the property's name.  (E.g. `/niftyThings/NiftyExample1#coolness`.)  The _quiet_ option prevents hooks from running when the property is updated.  
+
+Ordinarily, every property update is saved immediately, and each hook is notified upon each update.  If you're assigning several properties at once or performing operations on a chain of spectators, you should use the **update** method:
+
+		spectator.update do |s|
+			s.niftiness = :very
+			s.coolness = -40
+			s.hipness = "tragic"
+		end
+	
+**update** offers simple transaction behavior: it defers saving and hook announcement _for all spectators_ until the block is completed.  This is useful for changes that trickle down to a spectator's children.  If an exception is raised out of the block, all changes are canceled and nothing is saved or announced.
+
+If you want to defer saving and announcement _globally_, there is also a class method version (**Spectate::Spectator.update**) which supplies no parameters, but otherwise offers the same behavior as calling the instance method on the tree's root node.
+
+Sociology of Spectators
+-----------------------
+[describe the tree]
+
+The following read-only attributes are available for convenience:
+
+* **path** is the URI path used to uniquely locate this spectator in REST requests.  It also indicates the spectator's position in the storage tree, and is (not coincidentally) the key value used for hash storage.  The path is the concatenation of the parent's path and a URI-safe version of the spectator's name.  All of the following relationship attributes are based on transformations of the path.
+* **parent** is the parent spectator.
+* **children** is an array of all spectators immediately descended from this one.  
+* **descendants** is an array of the spectator's children, all of _their_ children, and so on, in breadth-first order.
+* **siblings** is an array of all of the parent's children, excluding the current spectator.
 
 
 

@@ -8,4 +8,4 @@ require 'spectate/server'
 
 # Set vital defaults
 Spectate::VERSION = File.read(File.join(File.dirname(__FILE__), '..', 'VERSION')).chomp
-Spectate::Config[:basedir] = ENV['SPECTATE_DIR'] || File.expand_path(File.join('~','.spectate'))
+Spectate::Config['basedir'] = ENV['SPECTATE_DIR'] || File.expand_path(File.join('~','.spectate'))

@@ -15,7 +15,7 @@ describe "Command 'spectate'" do
   end
   
   it "executes" do
-    system('spectate').should_not be_nil
+    `spectate --help`.should =~ /Spectate/i
   end
   
   # We have several options for displaying help
@@ -34,9 +34,6 @@ describe "Command 'spectate'" do
     `spectate --blah1234`.should =~ /invalid option: --blah1234.*Usage:/m
   end
   
-  it "attempts to start Spectate if not already running" do
-    `spectate -d #{@tempdir}`.should =~ /Starting Spectate/
-  end
   
   %w{-d --directory}.each do |option|
     it "requires a directory parameter" do
@@ -50,7 +47,33 @@ describe "Command 'spectate'" do
       FileUtils.rm_r tmpdir, :force => true, :secure => true
     end
   end
+
+  describe "starting" do
+    it "attempts to start Spectate if not already running" do
+      `spectate`.should =~ /Starting Spectate/
+    end
+    it "complains if Spectate is already running" 
+    it "creates a PID file in the base directory" do
+      `spectate`
+      File.exists?(File.join(@tempdir,'spectate.pid')).should be_true
+    end
+    after(:each) do
+      `spectate --stop`
+    end
+  end
   
+  describe "--stop" do
+    before(:each) do
+      `spectate`
+    end
+    it "stops the server" do
+      `spectate --stop`.should =~ /stopped./
+    end
+    it "complains if the server wasn't running" do
+      `spectate --stop`
+      `spectate --stop`.should =~ /wasn't running!/
+    end
+  end
   
   
   after(:all) do

@@ -6,6 +6,7 @@ describe Spectate, "ping method" do
   end
   
   it "returns false if no Spectate server is running"
+    
   
   it "returns a Status object if a Spectate server is running"
 
