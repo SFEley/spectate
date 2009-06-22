@@ -97,7 +97,7 @@ describe Spectate::Client do
   end
   
   shared_examples_for "a Rest-Client proxy method" do
-    STATUS_JSON = '{"data":{"uptime":"23h 14m 11s","summary":"Spectate v0.0.0.0"},"json_class":"Spectate::Status"}'
+    STATUS_JSON = '{"uptime":"23h 14m 11s","summary":"Spectate v0.0.0.0"}'
     before(:each) do
       method = @method
       @dummy = stub('Rest Client') do
@@ -119,6 +119,10 @@ describe Spectate::Client do
     end
     it "returns nil on a Resource Not Found error" do
       @dummy.expects(@method).raises(RestClient::ResourceNotFound)
+      @this.send(@method).should be_nil
+    end
+    it "returns nil on a Connection Refused error" do
+      @dummy.expects(@method).raises(Errno::ECONNREFUSED)
       @this.send(@method).should be_nil
     end
     it "raises any other exception" do

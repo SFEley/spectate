@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'sinatra/base'
-
+require 'json'
 module Spectate
   class Server < Sinatra::Base
     configure do
@@ -8,7 +8,7 @@ module Spectate
     end
     
     get '/' do
-      "Spectate v#{VERSION}"
+      {:summary => "Spectate v#{VERSION}"}.to_json
     end
   end
 end

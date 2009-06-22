@@ -8,7 +8,7 @@ module Spectate
       def start_server
         create_config
         call = `spectate`
-        puts call unless call =~ /Starting Spectate.\s*$/m
+        puts call unless call =~ /Starting Spectate on \S+:\d+\.\.\.\s*$/m
       end
       
       def stop_server

@@ -1,8 +1,8 @@
-require 'spectate/client'
 module Spectate
   module Ping
     def ping
-      true
+      c = Spectate::Client.new
+      c.get
     end
   end
 end

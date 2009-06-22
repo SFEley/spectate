@@ -79,14 +79,14 @@ module Spectate
         puts "Spectate is already running!"
       else
         puts "Starting Spectate on #{Spectate::Config['host']}:#{Spectate::Config['port']}..."
-        Dir.chdir Spectate::Config['basedir'] do |dir|
+        Dir.chdir Spectate::Config.basedir do |dir|
           system "rackup -D -o #{Spectate::Config['host']} -p #{Spectate::Config['port']} -P spectate.pid config.ru"
         end
       end
     end
     
     def self.kill_server()
-      pidfile = File.join(Spectate::Config['basedir'], 'spectate.pid')
+      pidfile = File.join(Spectate::Config.basedir, 'spectate.pid')
       pid = File.read(pidfile).to_i if File.exists?(pidfile)
       if pid and `ps x #{pid}` =~ /rackup.*-p #{Spectate::Config['port']}/
         Process.kill("KILL",pid) and puts "Spectate stopped."

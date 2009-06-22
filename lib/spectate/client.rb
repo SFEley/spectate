@@ -25,8 +25,10 @@ module Spectate
     
     def get
       response = @driver.get
-      JSON.parse(response) if accept == 'application/json'
+      s = Spectate::Status.new(root,'/',JSON.parse(response)) if accept == 'application/json'
     rescue RestClient::ResourceNotFound
+      nil
+    rescue Errno::ECONNREFUSED
       nil
     end
   end

@@ -1,9 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Spectate::Status do
+  
   before(:each) do
     @this = Spectate::Status.new("http://localhost:47502", '/test/foo/bar_camp', :foo => 'bar', :yoo => 'yar')
   end
+  
   it "behaves like a hash" do
     @this[:foo].should == 'bar'
   end
@@ -17,11 +19,12 @@ describe Spectate::Status do
   end
   
   it "knows its source" do
-    @this.source.should == '/test/foo/bar'
+    @this.source.should == '/test/foo/bar_camp'
   end
   
   it "knows its name" do
     @this.name.should == 'bar camp'
+  end
   
   it "knows its parent" do
     @this.parent.should == '/test/foo'

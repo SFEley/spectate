@@ -6,8 +6,11 @@ require 'rubygems'
 require 'spectate/config'
 
 module Spectate
+  autoload :Client, 'spectate/client'
+  autoload :Encode, 'spectate/encode'
   autoload :Ping, 'spectate/ping'
   autoload :Server, 'spectate/server'
+  autoload :Status, 'spectate/status'
   # Set vital defaults
   VERSION = File.read(File.join(File.dirname(__FILE__), '..', 'VERSION')).chomp
   ROOT_DIR = File.expand_path(File.join('~','.spectate')) unless const_defined?(:ROOT_DIR)
